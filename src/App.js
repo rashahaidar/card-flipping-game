@@ -6,7 +6,7 @@ import './App.css';
 
 
 
-let cardsList=[
+const cardsList=[
   { 
 
     src:'/images/Lion.png',
@@ -33,27 +33,27 @@ const App=()=> {
   const[choice2,setChoice2]=useState('')
   const[choice3,setChoice3]=useState('')
   const[canClick,setcanClick]=useState(true)
-  const[counter,setCounter]=useState()
+  const[timer,setTimer]=useState()
   const[found,setFound]=useState(0)
   const[status,setStatus]=useState({game:false,condition:"Start"})
  
-
+  //On Timer change
   useEffect(()=>{
     
     let timeOut=setTimeout(() => {
-      if(counter>0 && found!==3){
+      if(timer>0 && found!==3){
        
-        setCounter(counter=>counter-1)
+        setTimer(timer=>timer-1)
       }
       else{
-        if(counter>=0 && found===3){
+        if(timer>=0 && found===3){
           //clearTimeout(setCounter(0))
           console.log("You won")
           setStatus({game:false,condition:"Success"})
         }
         else{
-          if(counter===0 && found!==3){
-            clearTimeout(setCounter(0))
+          if(timer===0 && found!==3){
+            clearTimeout(setTimer(0))
             setcanClick(false)
             console.log("You lost")
             setStatus({game:false,condition:"Fail"})
@@ -65,33 +65,32 @@ const App=()=> {
     return ()=>clearTimeout(timeOut)
     
      
-  },[counter])
+  },[timer,found])
 
 
   useEffect(()=>{
-   // setCounter(counter=>counter-1)
-   cardsList=[...cardsList,...cardsList,...cardsList]
+    //Triplicate Array of Cards
+    let triplicatedCards=[...cardsList,...cardsList,...cardsList]
 
-   //Add id to each card object
-   let updatedCard=cardsList.reduce((acc,currentValue,currentIndex)=>{
+    //Add id to each card object
+    let updatedCards=triplicatedCards.reduce((acc,currentValue,currentIndex)=>{
       return [...acc,{...currentValue,i:currentIndex+1}]
     },[])
     
     //Shuffle cards and set state
-     setCards(shuffle(updatedCard))
-    
-  },[])
+     setCards(shuffle(updatedCards))
+     },[])
 
-  const shuffle=(cards)=>{
-
-    return cards.sort(()=>Math.random()-0.5)
-  }
-
+  //Shuffle Cards
+  const shuffle=(cards)=>cards.sort(()=>Math.random()-0.5)
+  
+  //Start Game button click
   const handleStart=()=>{
     resetChoices()
     setFound(0)
     setcanClick(true)
-    setCounter(30)
+    //Start the timer
+    setTimer(30)
   
     //Unflip any flipped card then shuffle cards then set state
     setCards(shuffle(cards.map(card=>card.flipped?{...card,flipped:false}:card)))
@@ -100,30 +99,39 @@ const App=()=> {
     
  }
 
+ //Reset Choices
  const resetChoices=()=>{
    setChoice1('')
    setChoice2('')
    setChoice3('')
   }
 
+  
   const storeChoice=(card)=>{
    
+     //If Choice1 empty store in Choice1 else if Choice2 empty store in Choice2 else store in Choice3
      !choice1 ? setChoice1(card) : !choice2 ? setChoice2(card) : setChoice3(card)
+     //Find the chosen card and update flipped to True
      const findCard=cards.find(c=>c===card)
      const updatedCard={...findCard,flipped:true}
+     //Set state with the updated Cards
      setCards(cards.map(c=>c===card ? updatedCard : c))
  }
  
 
   useEffect(()=>{
+    //If 3 choices are selected
     if(choice1 && choice2 && choice3){
+      //Disable all the other unflipped cards
       setcanClick(false)
+      //If all selected choices are same
       if(choice1.src===choice2.src && choice2.src===choice3.src){
         resetChoices()
         setcanClick(true)
         setFound(found+1)
       }
       else{
+        //Flip the cards back after 1 sec
          setTimeout(() => {
          setCards(cards.map(c=>c.i===choice1.i || c.i===choice2.i || c.i===choice3.i ? {...c,flipped:false}:c))
          resetChoices()
@@ -131,43 +139,28 @@ const App=()=> {
         }, 1000);
       }
     }
-  },[choice1,choice2,choice3,cards])
+  },[choice1,choice2,choice3,cards,found])
 
 
   return (
    
      <div className='App'>
-       <div className='center'>
+     <div className='center'>
      <h1>Memory Game</h1>
      <h2>{status.condition==="Start" ? "Press Start to start game": status.condition==="Success" ? "You Won !" : status.condition==="Fail" ? "You Lost !" : ""}</h2>
-      <h3>{status.game && `Timer: ${counter}`}</h3>
-      <button onClick={handleStart}>{status.condition==="Start" ? "Start Game" : "Replay"}</button>
-       </div>
-       {
+     <h3>{status.game && `Timer: ${timer}`}</h3>
+     <button onClick={handleStart}>{status.condition==="Start" ? "Start Game" : "Replay"}</button>
+     </div>
+     {
           status.game && <div className='grid-container'>
           {cards.map((card,key)=>(
               <Card key={key} card={card} flipped={card.flipped} storeChoice={storeChoice} canClick={canClick}></Card>
-       
-           ))}
+            ))
+          }
         </div> 
-
-       }
-     
+     }
      </div>
-    // <div className='App'>
-    //   <div className='parent'>
-    //     parent
-    //     <div className='child1'>Child1</div>
-    //     <div className='child2'>
-    //      child2
-    //     </div>
-    //     <div className='child2'>
-    //      child3
-    //     </div>
-    //   </div>
-
-
-    // </div>
+ 
   );
 }
 

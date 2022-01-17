@@ -4,9 +4,6 @@
   align-content: center;
 }
 
-/* button {
-  margin-left: 430px;
-} */
 h2{
   color: grey;
   font-family: monospace;
@@ -28,7 +25,6 @@ button {
   border-color: currentColor;
  
 }
-
 
 h1 {
   
@@ -63,12 +59,7 @@ h1 {
   object-fit: contain;*/
   border-radius: 25px;
    height: 200px; 
-  width: 100%;
-  
- /*align-self: center;*/
-/* border: 5px solid blue;*/
- 
-  
+  width: 100%;  
 }
 
 .grid-item img{
